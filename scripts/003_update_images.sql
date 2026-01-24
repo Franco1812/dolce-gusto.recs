@@ -1,0 +1,23 @@
+-- Update capsules with local image paths
+UPDATE capsules SET image_url = '/capsules/espresso.jpg' WHERE name = 'Espresso';
+UPDATE capsules SET image_url = '/capsules/espresso-intenso.jpg' WHERE name = 'Espresso Intenso';
+UPDATE capsules SET image_url = '/capsules/ristretto.jpg' WHERE name = 'Ristretto';
+UPDATE capsules SET image_url = '/capsules/espresso-decaf.jpg' WHERE name = 'Espresso Decaffeinato';
+UPDATE capsules SET image_url = '/capsules/lungo.jpg' WHERE name = 'Lungo';
+UPDATE capsules SET image_url = '/capsules/americano.jpg' WHERE name = 'Americano';
+UPDATE capsules SET image_url = '/capsules/cortado.jpg' WHERE name = 'Cortado';
+UPDATE capsules SET image_url = '/capsules/cappuccino.jpg' WHERE name = 'Cappuccino';
+UPDATE capsules SET image_url = '/capsules/latte-macchiato.jpg' WHERE name = 'Latte Macchiato';
+UPDATE capsules SET image_url = '/capsules/cafe-con-leche.jpg' WHERE name = 'Café con Leche';
+UPDATE capsules SET image_url = '/capsules/flat-white.jpg' WHERE name = 'Flat White';
+UPDATE capsules SET image_url = '/capsules/chococino.jpg' WHERE name = 'Chococino';
+UPDATE capsules SET image_url = '/capsules/nesquik.jpg' WHERE name = 'Nesquik';
+UPDATE capsules SET image_url = '/capsules/mocha.jpg' WHERE name = 'Mocha';
+UPDATE capsules SET image_url = '/capsules/cappuccino-ice.jpg' WHERE name = 'Cappuccino Ice';
+UPDATE capsules SET image_url = '/capsules/cold-brew.jpg' WHERE name = 'Cold Brew';
+UPDATE capsules SET image_url = '/capsules/starbucks-caramel.jpg' WHERE name = 'Starbucks Caramel Macchiato';
+UPDATE capsules SET image_url = '/capsules/starbucks-cappuccino.jpg' WHERE name = 'Starbucks Cappuccino';
+UPDATE capsules SET image_url = '/capsules/starbucks-latte.jpg' WHERE name = 'Starbucks Latte Macchiato';
+UPDATE capsules SET image_url = '/capsules/starbucks-colombia.jpg' WHERE name = 'Starbucks Colombia';
+UPDATE capsules SET image_url = '/capsules/starbucks-house-blend.jpg' WHERE name = 'Starbucks House Blend';
+UPDATE capsules SET image_url = '/capsules/starbucks-espresso.jpg' WHERE name = 'Starbucks Espresso Roast';

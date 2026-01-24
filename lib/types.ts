@@ -10,6 +10,7 @@ export interface Capsule {
 
 export interface ListItem {
   id: string;
+  user_id: string;
   capsule_id: string;
   status: 'pending' | 'tried';
   created_at: string;
@@ -18,6 +19,7 @@ export interface ListItem {
 
 export interface Review {
   id: string;
+  user_id: string;
   capsule_id: string;
   rating: number;
   comment: string | null;

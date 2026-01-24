@@ -110,7 +110,7 @@ export function DolceGustoApp({ user }: DolceGustoAppProps) {
     setIsLoading(true);
     const { data, error } = await supabase
       .from("list_items")
-      .insert({ capsule_id: capsuleId, status: "pending" })
+      .insert({ capsule_id: capsuleId, user_id: user.id, status: "pending" })
       .select()
       .single();
 
@@ -165,7 +165,7 @@ export function DolceGustoApp({ user }: DolceGustoAppProps) {
     } else {
       const { data, error } = await supabase
         .from("reviews")
-        .insert({ capsule_id: capsuleId, rating, comment })
+        .insert({ capsule_id: capsuleId, user_id: user.id, rating, comment })
         .select()
         .single();
 
@@ -193,12 +193,12 @@ export function DolceGustoApp({ user }: DolceGustoAppProps) {
                   Capsulas Dolce Gusto
                 </h1>
                 <p className="text-sm text-muted-foreground">
-                  Recomendaciones para ti
+                  Recomendaciones para Mailu caminos
                 </p>
               </div>
             </div>
             {/* Theme Toggle & Logout */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               {mounted && (
                 <Button
                   variant="outline"
@@ -214,12 +214,15 @@ export function DolceGustoApp({ user }: DolceGustoAppProps) {
                   <span className="sr-only">Cambiar tema</span>
                 </Button>
               )}
+              <span className="text-sm text-foreground font-medium hidden sm:inline">
+                {user.user_metadata?.name || user.email?.split('@')[0]}
+              </span>
               <Button
                 variant="outline"
                 size="icon"
                 onClick={() => supabase.auth.signOut()}
                 className="rounded-full"
-                title={user.email || "Cerrar sesión"}
+                title="Cerrar sesión"
               >
                 <LogOut className="h-5 w-5" />
                 <span className="sr-only">Cerrar sesión</span>

@@ -1,16 +1,23 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useTheme } from "next-themes";
 import { createClient } from "@/lib/supabase/client";
 import { CapsuleCard } from "./capsule-card";
 import { ReviewDialog } from "./review-dialog";
 import { FilterTabs } from "./filter-tabs";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Coffee, Search } from "lucide-react";
+import { Coffee, Search, Sun, Moon, LogOut } from "lucide-react";
 import type { Capsule, ListItem, Review, CapsuleWithStatus } from "@/lib/types";
+import type { User } from "@supabase/supabase-js";
 
-export function DolceGustoApp() {
+interface DolceGustoAppProps {
+  user: User;
+}
+
+export function DolceGustoApp({ user }: DolceGustoAppProps) {
   const [capsules, setCapsules] = useState<Capsule[]>([]);
   const [listItems, setListItems] = useState<ListItem[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -20,8 +27,14 @@ export function DolceGustoApp() {
   const [selectedCapsule, setSelectedCapsule] = useState<CapsuleWithStatus | null>(null);
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
+  const { theme, setTheme } = useTheme();
   const supabase = createClient();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     loadData();
@@ -170,17 +183,47 @@ export function DolceGustoApp() {
       {/* Header */}
       <header className="sticky top-0 z-10 bg-card border-b border-border">
         <div className="max-w-6xl mx-auto px-4 py-4">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center">
-              <Coffee className="w-6 h-6 text-primary-foreground" />
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center">
+                <Coffee className="w-6 h-6 text-primary-foreground" />
+              </div>
+              <div>
+                <h1 className="text-xl sm:text-2xl font-bold text-foreground">
+                  Capsulas Dolce Gusto
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  Recomendaciones para ti
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-foreground">
-                Capsulas Dolce Gusto
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                Recomendaciones para ti
-              </p>
+            {/* Theme Toggle & Logout */}
+            <div className="flex items-center gap-2">
+              {mounted && (
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  className="rounded-full"
+                >
+                  {theme === "dark" ? (
+                    <Sun className="h-5 w-5" />
+                  ) : (
+                    <Moon className="h-5 w-5" />
+                  )}
+                  <span className="sr-only">Cambiar tema</span>
+                </Button>
+              )}
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => supabase.auth.signOut()}
+                className="rounded-full"
+                title={user.email || "Cerrar sesión"}
+              >
+                <LogOut className="h-5 w-5" />
+                <span className="sr-only">Cerrar sesión</span>
+              </Button>
             </div>
           </div>
 

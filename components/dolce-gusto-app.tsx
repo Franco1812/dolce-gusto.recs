@@ -9,13 +9,15 @@ import { FilterTabs } from "./filter-tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Coffee, Search, Sun, Moon, LogOut } from "lucide-react";
+import { Coffee, Search, Sun, Moon, LogOut, Shield } from "lucide-react";
 import type { Capsule, ListItem, Review, CapsuleWithStatus } from "@/lib/types";
 import type { User } from "@supabase/supabase-js";
 
 interface DolceGustoAppProps {
   user: User;
 }
+
+const ADMIN_EMAIL = "franco.pagano66@gmail.com";
 
 export function DolceGustoApp({ user }: DolceGustoAppProps) {
   const [capsules, setCapsules] = useState<Capsule[]>([]);
@@ -32,6 +34,8 @@ export function DolceGustoApp({ user }: DolceGustoAppProps) {
   const { theme, setTheme } = useTheme();
   const supabase = createClient();
 
+  const isAdmin = user.email === ADMIN_EMAIL;
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -41,15 +45,24 @@ export function DolceGustoApp({ user }: DolceGustoAppProps) {
   }, []);
 
   async function loadData() {
-    const [capsulesRes, listItemsRes, reviewsRes] = await Promise.all([
+    const [capsulesRes, listItemsRes, reviewsRes, profilesRes] = await Promise.all([
       supabase.from("capsules").select("*").order("name"),
       supabase.from("list_items").select("*"),
       supabase.from("reviews").select("*"),
+      supabase.from("profiles").select("*"),
     ]);
 
     if (capsulesRes.data) setCapsules(capsulesRes.data);
     if (listItemsRes.data) setListItems(listItemsRes.data);
-    if (reviewsRes.data) setReviews(reviewsRes.data);
+
+    // Combinar reviews con profiles manualmente
+    if (reviewsRes.data) {
+      const reviewsWithProfiles = reviewsRes.data.map(review => ({
+        ...review,
+        profiles: profilesRes.data?.find(p => p.id === review.user_id) || null
+      }));
+      setReviews(reviewsWithProfiles);
+    }
   }
 
   const categories = useMemo(() => {
@@ -214,9 +227,17 @@ export function DolceGustoApp({ user }: DolceGustoAppProps) {
                   <span className="sr-only">Cambiar tema</span>
                 </Button>
               )}
-              <span className="text-sm text-foreground font-medium hidden sm:inline">
-                {user.user_metadata?.name || user.email?.split('@')[0]}
-              </span>
+              <div className="hidden sm:flex items-center gap-2">
+                {isAdmin && (
+                  <span className="flex items-center gap-1 text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full">
+                    <Shield className="h-3 w-3" />
+                    Admin
+                  </span>
+                )}
+                <span className="text-sm text-foreground font-medium">
+                  {user.user_metadata?.name || user.email?.split('@')[0]}
+                </span>
+              </div>
               <Button
                 variant="outline"
                 size="icon"
@@ -281,6 +302,8 @@ export function DolceGustoApp({ user }: DolceGustoAppProps) {
                 onMarkTried={handleMarkTried}
                 onOpenReview={handleOpenReview}
                 isLoading={isLoading}
+                isAdmin={isAdmin}
+                allReviews={reviews}
               />
             ))}
           </div>

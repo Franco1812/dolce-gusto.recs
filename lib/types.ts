@@ -17,6 +17,12 @@ export interface ListItem {
   capsule?: Capsule;
 }
 
+export interface Profile {
+  id: string;
+  name: string | null;
+  email: string | null;
+}
+
 export interface Review {
   id: string;
   user_id: string;
@@ -25,9 +31,11 @@ export interface Review {
   comment: string | null;
   created_at: string;
   capsule?: Capsule;
+  profiles?: Profile;
 }
 
 export interface CapsuleWithStatus extends Capsule {
   list_item?: ListItem;
   review?: Review;
+  all_reviews?: Review[];
 }

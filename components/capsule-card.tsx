@@ -4,8 +4,8 @@ import { useState } from "react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Coffee, Plus, Check, Star } from "lucide-react";
-import type { CapsuleWithStatus } from "@/lib/types";
+import { Coffee, Plus, Check, Star, User } from "lucide-react";
+import type { CapsuleWithStatus, Review } from "@/lib/types";
 
 // Color mapping for categories
 const categoryColors: Record<string, string> = {
@@ -15,6 +15,8 @@ const categoryColors: Record<string, string> = {
   "Chocolate": "from-amber-600 to-amber-800",
   "Café Frío": "from-sky-200 to-sky-300",
   "Starbucks": "from-green-700 to-green-900",
+  "Fríos": "from-sky-300 to-sky-400",
+  "Clásicos": "from-amber-700 to-amber-900",
 };
 
 interface CapsuleCardProps {
@@ -23,6 +25,8 @@ interface CapsuleCardProps {
   onMarkTried: (capsuleId: string) => void;
   onOpenReview: (capsule: CapsuleWithStatus) => void;
   isLoading?: boolean;
+  isAdmin?: boolean;
+  allReviews?: Review[];
 }
 
 export function CapsuleCard({ 
@@ -30,12 +34,19 @@ export function CapsuleCard({
   onAddToList, 
   onMarkTried, 
   onOpenReview,
-  isLoading 
+  isLoading,
+  isAdmin,
+  allReviews = []
 }: CapsuleCardProps) {
   const [imageError, setImageError] = useState(false);
   const isInList = !!capsule.list_item;
   const isTried = capsule.list_item?.status === 'tried';
   const hasReview = !!capsule.review;
+  
+  // Para admin, mostrar todas las reseñas de esta cápsula
+  const reviewsToShow = isAdmin 
+    ? allReviews.filter(r => r.capsule_id === capsule.id)
+    : capsule.review ? [capsule.review] : [];
   
   const gradientClass = categoryColors[capsule.category] || "from-secondary to-background";
 
@@ -85,25 +96,35 @@ export function CapsuleCard({
         <p className="text-sm text-muted-foreground leading-relaxed">
           {capsule.description}
         </p>
-        {hasReview && (
-          <div className="mt-3 p-2 bg-accent rounded-md">
-            <div className="flex items-center gap-1 mb-1">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Star
-                  key={i}
-                  className={`w-3 h-3 ${
-                    i < (capsule.review?.rating || 0)
-                      ? "fill-primary text-primary"
-                      : "text-muted-foreground"
-                  }`}
-                />
-              ))}
-            </div>
-            {capsule.review?.comment && (
-              <p className="text-xs text-muted-foreground italic line-clamp-2">
-                "{capsule.review.comment}"
-              </p>
-            )}
+        {reviewsToShow.length > 0 && (
+          <div className="mt-3 space-y-2">
+            {reviewsToShow.map((review) => (
+              <div key={review.id} className="p-2 bg-accent rounded-md">
+                {isAdmin && review.profiles && (
+                  <div className="flex items-center gap-1 mb-1 text-xs text-muted-foreground">
+                    <User className="w-3 h-3" />
+                    <span className="font-medium">{review.profiles.name || review.profiles.email}</span>
+                  </div>
+                )}
+                <div className="flex items-center gap-1 mb-1">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`w-3 h-3 ${
+                        i < review.rating
+                          ? "fill-primary text-primary"
+                          : "text-muted-foreground"
+                      }`}
+                    />
+                  ))}
+                </div>
+                {review.comment && (
+                  <p className="text-xs text-muted-foreground italic line-clamp-2">
+                    "{review.comment}"
+                  </p>
+                )}
+              </div>
+            ))}
           </div>
         )}
       </CardContent>

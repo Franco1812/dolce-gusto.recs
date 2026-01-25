@@ -6,6 +6,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -56,14 +57,17 @@ export function ReviewDialog({
             <Coffee className="w-5 h-5 text-primary" />
             {capsule?.review ? "Editar Reseña" : "Nueva Reseña"}
           </DialogTitle>
+          <DialogDescription>
+            Calificá y dejá tu opinión sobre esta cápsula
+          </DialogDescription>
         </DialogHeader>
-        
+
         <div className="space-y-4 py-4">
           <div>
             <p className="text-sm font-medium mb-1 text-foreground">{capsule?.name}</p>
             <p className="text-xs text-muted-foreground">{capsule?.category}</p>
           </div>
-          
+
           <div>
             <p className="text-sm font-medium mb-2 text-foreground">Calificación</p>
             <div className="flex gap-1">
@@ -77,17 +81,16 @@ export function ReviewDialog({
                   className="p-1 transition-transform hover:scale-110"
                 >
                   <Star
-                    className={`w-8 h-8 transition-colors ${
-                      i < (hoveredRating || rating)
-                        ? "fill-primary text-primary"
-                        : "text-muted-foreground"
-                    }`}
+                    className={`w-8 h-8 transition-colors ${i < (hoveredRating || rating)
+                      ? "fill-primary text-primary"
+                      : "text-muted-foreground"
+                      }`}
                   />
                 </button>
               ))}
             </div>
           </div>
-          
+
           <div>
             <p className="text-sm font-medium mb-2 text-foreground">Comentario (opcional)</p>
             <Textarea
@@ -98,13 +101,13 @@ export function ReviewDialog({
             />
           </div>
         </div>
-        
+
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancelar
           </Button>
-          <Button 
-            onClick={handleSubmit} 
+          <Button
+            onClick={handleSubmit}
             disabled={rating === 0 || isLoading}
           >
             {isLoading ? "Guardando..." : "Guardar Reseña"}

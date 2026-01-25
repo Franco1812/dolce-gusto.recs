@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Coffee, Search, Sun, Moon, LogOut, Shield } from "lucide-react";
-import type { Capsule, ListItem, Review, CapsuleWithStatus } from "@/lib/types";
+import type { Capsule, ListItem, Review, CapsuleWithStatus, Profile } from "@/lib/types";
 import type { User } from "@supabase/supabase-js";
 
 interface DolceGustoAppProps {
@@ -57,9 +57,9 @@ export function DolceGustoApp({ user }: DolceGustoAppProps) {
 
     // Combinar reviews con profiles manualmente
     if (reviewsRes.data) {
-      const reviewsWithProfiles = reviewsRes.data.map(review => ({
+      const reviewsWithProfiles = reviewsRes.data.map((review: Review) => ({
         ...review,
-        profiles: profilesRes.data?.find(p => p.id === review.user_id) || null
+        profiles: profilesRes.data?.find((p: Profile) => p.id === review.user_id) || null
       }));
       setReviews(reviewsWithProfiles);
     }
@@ -148,6 +148,28 @@ export function DolceGustoApp({ user }: DolceGustoAppProps) {
         setListItems((prev) =>
           prev.map((li) => (li.id === data.id ? data : li))
         );
+      }
+    }
+    setIsLoading(false);
+  }
+
+  async function handleRemoveFromList(capsuleId: string) {
+    setIsLoading(true);
+    const listItem = listItems.find((li) => li.capsule_id === capsuleId);
+    if (listItem) {
+      const { error } = await supabase
+        .from("list_items")
+        .delete()
+        .eq("id", listItem.id);
+
+      if (!error) {
+        setListItems((prev) => prev.filter((li) => li.id !== listItem.id));
+        // También eliminar la review si existe
+        const review = reviews.find((r) => r.capsule_id === capsuleId && r.user_id === user.id);
+        if (review) {
+          await supabase.from("reviews").delete().eq("id", review.id);
+          setReviews((prev) => prev.filter((r) => r.id !== review.id));
+        }
       }
     }
     setIsLoading(false);
@@ -301,6 +323,7 @@ export function DolceGustoApp({ user }: DolceGustoAppProps) {
                 onAddToList={handleAddToList}
                 onMarkTried={handleMarkTried}
                 onOpenReview={handleOpenReview}
+                onRemoveFromList={handleRemoveFromList}
                 isLoading={isLoading}
                 isAdmin={isAdmin}
                 allReviews={reviews}

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Coffee, Plus, Check, Star, User } from "lucide-react";
+import { Coffee, Plus, Check, Star, User, X } from "lucide-react";
 import type { CapsuleWithStatus, Review } from "@/lib/types";
 
 // Color mapping for categories
@@ -24,6 +24,7 @@ interface CapsuleCardProps {
   onAddToList: (capsuleId: string) => void;
   onMarkTried: (capsuleId: string) => void;
   onOpenReview: (capsule: CapsuleWithStatus) => void;
+  onRemoveFromList: (capsuleId: string) => void;
   isLoading?: boolean;
   isAdmin?: boolean;
   allReviews?: Review[];
@@ -34,6 +35,7 @@ export function CapsuleCard({
   onAddToList, 
   onMarkTried, 
   onOpenReview,
+  onRemoveFromList,
   isLoading,
   isAdmin,
   allReviews = []
@@ -143,28 +145,50 @@ export function CapsuleCard({
           </Button>
         )}
         {isInList && !isTried && (
-          <Button 
-            variant="default" 
-            size="sm" 
-            className="flex-1"
-            onClick={() => onMarkTried(capsule.id)}
-            disabled={isLoading}
-          >
-            <Check className="w-4 h-4 mr-1" />
-            Probada
-          </Button>
+          <>
+            <Button 
+              variant="default" 
+              size="sm" 
+              className="flex-1"
+              onClick={() => onMarkTried(capsule.id)}
+              disabled={isLoading}
+            >
+              <Check className="w-4 h-4 mr-1" />
+              Probada
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => onRemoveFromList(capsule.id)}
+              disabled={isLoading}
+              title="Quitar de la lista"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </>
         )}
         {isTried && (
-          <Button 
-            variant={hasReview ? "secondary" : "default"}
-            size="sm" 
-            className="flex-1"
-            onClick={() => onOpenReview(capsule)}
-            disabled={isLoading}
-          >
-            <Star className="w-4 h-4 mr-1" />
-            {hasReview ? "Ver Reseña" : "Reseñar"}
-          </Button>
+          <>
+            <Button 
+              variant={hasReview ? "secondary" : "default"}
+              size="sm" 
+              className="flex-1"
+              onClick={() => onOpenReview(capsule)}
+              disabled={isLoading}
+            >
+              <Star className="w-4 h-4 mr-1" />
+              {hasReview ? "Ver Reseña" : "Reseñar"}
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => onRemoveFromList(capsule.id)}
+              disabled={isLoading}
+              title="Quitar de la lista"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </>
         )}
       </CardFooter>
     </Card>

@@ -225,7 +225,7 @@ export function DolceGustoApp({ user }: DolceGustoAppProps) {
               </div>
               <div>
                 <h1 className="text-xl sm:text-2xl font-bold text-foreground">
-                  Capsulas Dolce Gusto
+                  Catálogo de Cápsulas
                 </h1>
                 <p className="text-sm text-muted-foreground">
                   Recomendaciones para Mailu caminos

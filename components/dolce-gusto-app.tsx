@@ -8,6 +8,7 @@ import { ReviewDialog } from "./review-dialog";
 import { FilterTabs } from "./filter-tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Coffee, Search, Sun, Moon, LogOut, Shield } from "lucide-react";
 import type { Capsule, ListItem, Review, CapsuleWithStatus, Profile } from "@/lib/types";
@@ -18,6 +19,7 @@ interface DolceGustoAppProps {
 }
 
 const ADMIN_EMAIL = "franco.pagano66@gmail.com";
+const SPECIAL_USER_EMAIL = "pressia97@gmail.com";
 
 export function DolceGustoApp({ user }: DolceGustoAppProps) {
   const [capsules, setCapsules] = useState<Capsule[]>([]);
@@ -30,11 +32,13 @@ export function DolceGustoApp({ user }: DolceGustoAppProps) {
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [showPersonalMessage, setShowPersonalMessage] = useState(true);
 
   const { theme, setTheme } = useTheme();
   const supabase = createClient();
 
   const isAdmin = user.email === ADMIN_EMAIL;
+  const hasPersonalMessage = user.email === SPECIAL_USER_EMAIL;
 
   useEffect(() => {
     setMounted(true);
@@ -294,6 +298,28 @@ export function DolceGustoApp({ user }: DolceGustoAppProps) {
               </Button>
             </div>
           </div>
+
+          {/* Mensaje personalizado para usuaria especial */}
+          {hasPersonalMessage && showPersonalMessage && (
+            <div className="mb-3">
+              <Alert>
+                <AlertTitle>Mensaje para vos 💌</AlertTitle>
+                <AlertDescription className="flex items-start justify-between gap-4">
+                  <span>
+                    Buen dia chemical mailu!!!! espero que estes arrancando tu dia con un cafe bien fuerte y dejando una reseña sino, hay tabla wacho q tengas lindo dia
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="shrink-0"
+                    onClick={() => setShowPersonalMessage(false)}
+                  >
+                    Cerrar
+                  </Button>
+                </AlertDescription>
+              </Alert>
+            </div>
+          )}
 
           {/* Search and Category Filter */}
           <div className="flex flex-col sm:flex-row gap-3 mb-4">

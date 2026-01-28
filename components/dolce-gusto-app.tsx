@@ -65,10 +65,8 @@ export function DolceGustoApp({ user }: DolceGustoAppProps) {
     }
   }
 
-  const categories = useMemo(() => {
-    const cats = [...new Set(capsules.map((c) => c.category))];
-    return cats.sort();
-  }, [capsules]);
+  // Filtro de marca (Dolce Gusto vs Nespresso/compatibles)
+  type BrandFilter = "all" | "dolce-gusto" | "nespresso";
 
   const capsulesWithStatus: CapsuleWithStatus[] = useMemo(() => {
     return capsules.map((capsule) => ({
@@ -77,6 +75,9 @@ export function DolceGustoApp({ user }: DolceGustoAppProps) {
       review: reviews.find((r) => r.capsule_id === capsule.id),
     }));
   }, [capsules, listItems, reviews]);
+
+  const isNespressoBrand = (capsule: CapsuleWithStatus) =>
+    capsule.category === "Nespresso" || capsule.category === "Kapselmaker";
 
   const filteredCapsules = useMemo(() => {
     return capsulesWithStatus.filter((capsule) => {
@@ -90,8 +91,11 @@ export function DolceGustoApp({ user }: DolceGustoAppProps) {
         return false;
       }
 
-      // Category filter
-      if (categoryFilter !== "all" && capsule.category !== categoryFilter) {
+      // Brand filter (Dolce Gusto vs Nespresso/compatibles)
+      if (categoryFilter === "dolce-gusto" && isNespressoBrand(capsule)) {
+        return false;
+      }
+      if (categoryFilter === "nespresso" && !isNespressoBrand(capsule)) {
         return false;
       }
 
@@ -114,7 +118,8 @@ export function DolceGustoApp({ user }: DolceGustoAppProps) {
       // No contar cápsulas sin imagen
       if (!c.image_url) return false;
       if (search && !c.name.toLowerCase().includes(search.toLowerCase())) return false;
-      if (categoryFilter !== "all" && c.category !== categoryFilter) return false;
+      if (categoryFilter === "dolce-gusto" && isNespressoBrand(c)) return false;
+      if (categoryFilter === "nespresso" && !isNespressoBrand(c)) return false;
       return true;
     });
 
@@ -125,6 +130,16 @@ export function DolceGustoApp({ user }: DolceGustoAppProps) {
       reviewed: baseFiltered.filter((c) => !!c.review).length,
     };
   }, [capsulesWithStatus, search, categoryFilter]);
+
+  const dolceGustoCapsules = useMemo(
+    () => filteredCapsules.filter((c) => !isNespressoBrand(c)),
+    [filteredCapsules]
+  );
+
+  const nespressoCapsules = useMemo(
+    () => filteredCapsules.filter((c) => isNespressoBrand(c)),
+    [filteredCapsules]
+  );
 
   async function handleAddToList(capsuleId: string) {
     setIsLoading(true);
@@ -292,17 +307,17 @@ export function DolceGustoApp({ user }: DolceGustoAppProps) {
                 className="pl-10"
               />
             </div>
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            <Select
+              value={categoryFilter}
+              onValueChange={(value: BrandFilter) => setCategoryFilter(value)}
+            >
               <SelectTrigger className="w-full sm:w-48">
                 <SelectValue placeholder="Categoría" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todas las categorías</SelectItem>
-                {categories.map((cat) => (
-                  <SelectItem key={cat} value={cat}>
-                    {cat}
-                  </SelectItem>
-                ))}
+                <SelectItem value="all">Todas las cápsulas</SelectItem>
+                <SelectItem value="dolce-gusto">Dolce Gusto</SelectItem>
+                <SelectItem value="nespresso">Nespresso</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -322,20 +337,52 @@ export function DolceGustoApp({ user }: DolceGustoAppProps) {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredCapsules.map((capsule) => (
-              <CapsuleCard
-                key={capsule.id}
-                capsule={capsule}
-                onAddToList={handleAddToList}
-                onMarkTried={handleMarkTried}
-                onOpenReview={handleOpenReview}
-                onRemoveFromList={handleRemoveFromList}
-                isLoading={isLoading}
-                isAdmin={isAdmin}
-                allReviews={reviews}
-              />
-            ))}
+          <div className="space-y-8">
+            {dolceGustoCapsules.length > 0 && (
+              <section>
+                <h2 className="mb-3 text-lg font-semibold text-foreground">
+                  Dolce Gusto
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {dolceGustoCapsules.map((capsule) => (
+                    <CapsuleCard
+                      key={capsule.id}
+                      capsule={capsule}
+                      onAddToList={handleAddToList}
+                      onMarkTried={handleMarkTried}
+                      onOpenReview={handleOpenReview}
+                      onRemoveFromList={handleRemoveFromList}
+                      isLoading={isLoading}
+                      isAdmin={isAdmin}
+                      allReviews={reviews}
+                    />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {nespressoCapsules.length > 0 && (
+              <section>
+                <h2 className="mb-3 text-lg font-semibold text-foreground">
+                  Nespresso & compatibles
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {nespressoCapsules.map((capsule) => (
+                    <CapsuleCard
+                      key={capsule.id}
+                      capsule={capsule}
+                      onAddToList={handleAddToList}
+                      onMarkTried={handleMarkTried}
+                      onOpenReview={handleOpenReview}
+                      onRemoveFromList={handleRemoveFromList}
+                      isLoading={isLoading}
+                      isAdmin={isAdmin}
+                      allReviews={reviews}
+                    />
+                  ))}
+                </div>
+              </section>
+            )}
           </div>
         )}
       </main>

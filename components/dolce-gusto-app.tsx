@@ -80,6 +80,11 @@ export function DolceGustoApp({ user }: DolceGustoAppProps) {
 
   const filteredCapsules = useMemo(() => {
     return capsulesWithStatus.filter((capsule) => {
+      // Ocultar cápsulas que no tengan imagen configurada
+      if (!capsule.image_url) {
+        return false;
+      }
+
       // Search filter
       if (search && !capsule.name.toLowerCase().includes(search.toLowerCase())) {
         return false;
@@ -106,6 +111,8 @@ export function DolceGustoApp({ user }: DolceGustoAppProps) {
 
   const counts = useMemo(() => {
     const baseFiltered = capsulesWithStatus.filter((c) => {
+      // No contar cápsulas sin imagen
+      if (!c.image_url) return false;
       if (search && !c.name.toLowerCase().includes(search.toLowerCase())) return false;
       if (categoryFilter !== "all" && c.category !== categoryFilter) return false;
       return true;
